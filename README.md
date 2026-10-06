@@ -89,7 +89,7 @@ The empty passphrase first, then every ordered selection of 1 to n of your words
 | 9 | 986,410 | 3 h |
 | 10 | 9,864,101 | 30 h |
 
-8 to 9 words is the practical limit. The search space and a running ETA are printed as it goes.
+Up to 9 words finishes the same day, and 10 runs over a weekend. Beyond that, trim the list rather than wait: cut any word you're not fairly sure about. The search space and a running ETA are printed as it goes.
 
 ## Supported
 
