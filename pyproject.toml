@@ -1,14 +1,28 @@
 [project]
-name = "slip-39-passphrase-brute-force"
-version = "0.1.0"
-description = "SLIP-39 passphrase brute force tool with word combination support"
+name = "wallet-passphrase-recovery"
+version = "0.2.0"
+description = "Recover a forgotten SLIP-39 or BIP-39 wallet passphrase from a list of words you think it contains"
 readme = "README.md"
-requires-python = ">=3.12"
-
+license = "MIT"
+requires-python = ">=3.14"
 dependencies = [
-    "eth-account>=0.13.7",
-    "python-dotenv>=1.0.0",
-    "slip39>=13.1.0",
-    "requests>=2.28.0",
-    "mnemonic>=0.21",
+    "eth-account>=0.14.0",
+    "python-dotenv>=1.2.4",
+    "shamir-mnemonic>=0.3.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "tests"]
