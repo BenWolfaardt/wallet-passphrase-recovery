@@ -1,5 +1,5 @@
 [project]
-name = "slip-39-passphrase-brute-force"
+name = "wallet-passphrase-recovery"
 version = "0.2.0"
 description = "Recover a forgotten SLIP-39 or BIP-39 wallet passphrase from a list of words you think it contains"
 readme = "README.md"

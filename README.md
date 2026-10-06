@@ -1,6 +1,27 @@
-# SLIP-39 / BIP-39 passphrase recovery
+# Wallet passphrase recovery
 
-Forgot the passphrase on your hardware wallet but remember roughly which words went into it? Give this tool your mnemonic, the words you think the passphrase was built from, and an Ethereum address you know the wallet holds. It tries every ordered combination of those words until the derived address matches, entirely offline. I built it to recover the passphrase on my own SLIP-39 (Shamir) backup: the match was found by the SLIP-39 derivation here, checked on a Keystone, and the same passphrase then opened the wallet on a Trezor.
+Recover a forgotten hardware-wallet passphrase, offline, from words you think it was made of.
+
+The passphrase here is the optional extra secret on top of your recovery phrase: Trezor's "passphrase" or "hidden wallet", Ledger's "25th word". It is not the device PIN. Get it wrong and the wallet opens anyway, just to a different, empty wallet, so you cannot tell a wrong guess from a right one without knowing an address the real wallet holds. This tool takes that address, tries every ordered combination of your candidate words, and stops when the derived address matches.
+
+I built it to recover the passphrase on my own SLIP-39 (Shamir) backup. The SLIP-39 search here found it, I confirmed it on a Keystone, and the same passphrase then opened the wallet on my Trezor.
+
+## What you need
+
+- **Your recovery phrase.** A 12 to 24 word BIP-39 mnemonic, or SLIP-39 (Shamir) shares: one share, or enough to meet the threshold.
+- **Words you think the passphrase is built from.** The tool joins them in every order with no spaces, so `correct horse` also tries `horsecorrect`.
+- **One Ethereum address you know is in that wallet.** For example, an address you received funds at, found in your wallet app's history, an exchange's withdrawal history or a block explorer. The wallet's first address is index 0; if yours was the second, use `--index 1`.
+
+## Quick start
+
+```bash
+git clone https://github.com/BenWolfaardt/wallet-passphrase-recovery.git
+cd wallet-passphrase-recovery
+uv sync
+cp .env.example .env && uv run main.py slip39   # finds the passphrase of a public test wallet
+```
+
+[uv](https://docs.astral.sh/uv/) installs Python 3.14 if you don't have it. For your own wallet, delete `.env` and run `uv run main.py`: it asks for anything it needs.
 
 ## Safety
 
@@ -9,16 +30,6 @@ Forgot the passphrase on your hardware wallet but remember roughly which words w
 - **Don't put a real mnemonic in `.env`.** Leave `MNEMONIC` out and you are prompted for it with hidden input. There is deliberately no `--mnemonic` flag, so it never lands in your shell history.
 - On a match the tool prints the passphrase and nothing else: never the mnemonic or seed.
 - Once you have your funds back, move them to a fresh wallet with a new mnemonic.
-
-## Install
-
-Requires [uv](https://docs.astral.sh/uv/). uv fetches Python 3.14 if you don't have it.
-
-```bash
-git clone https://github.com/BenWolfaardt/slip-39-passphrase-brute-force.git
-cd slip-39-passphrase-brute-force
-uv sync
-```
 
 ## Usage
 
@@ -40,7 +51,7 @@ Exit codes: `0` found, `1` not found, `2` invalid input, `130` interrupted.
 
 ### SLIP-39 example
 
-`.env.example` holds the official SLIP-39 "2-of-3" test vector, so it runs as-is:
+`.env.example` holds Trezor's published SLIP-39 "2-of-3" test vector, so it runs as-is:
 
 ```console
 $ cp .env.example .env && uv run main.py slip39
@@ -52,13 +63,13 @@ Found passphrase: 'TREZOR'
 
 ### BIP-39 example
 
-The official BIP-39 test mnemonic `abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about`, entered at the prompt:
+Trezor's published BIP-39 test mnemonic `abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about`, entered at the prompt:
 
 ```console
 $ uv run main.py bip39 --words ZOR wallet TRE --target 0x9c32F71D4DB8Fb9e1A58B0a80dF79935e7256FA6
 Enter the mnemonic, one share per line, then an empty line. Input is hidden.
-Line 1:
-Line 2:
+Line 1:                     <- type the mnemonic, nothing is shown
+Line 2:                     <- press Enter on an empty line to finish
 Target: 0x9c32F71D4DB8Fb9e1A58B0a80dF79935e7256FA6 at m/44'/60'/0'/0/0
 Search space: 16 candidates from 3 words
 1/16 (6.2%), 95/s, ETA 0s
