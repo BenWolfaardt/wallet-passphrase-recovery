@@ -10,6 +10,7 @@ from eth_account.hdaccount import key_from_seed
 from eth_utils import is_checksum_address, is_hex_address, to_checksum_address
 
 DERIVATION_PATH = "m/44'/60'/0'/0/{index}"
+MAX_INDEX = 2**31 - 1
 PROGRESS_INTERVAL_SECONDS = 5.0
 
 Derive = Callable[[str], str]
@@ -44,6 +45,13 @@ def parse_target(address: str) -> str:
     if mixed_case and not is_checksum_address(address):
         raise ValueError(f"address has an invalid EIP-55 checksum, check for a typo: {address}")
     return to_checksum_address(address)
+
+
+def parse_index(raw: str | int) -> int:
+    index = int(raw)
+    if not 0 <= index <= MAX_INDEX:
+        raise ValueError(f"account index must be between 0 and {MAX_INDEX}: {index}")
+    return index
 
 
 def unique_words(words: list[str]) -> list[str]:

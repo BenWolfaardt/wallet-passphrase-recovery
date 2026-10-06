@@ -1,6 +1,13 @@
 import pytest
 
-from bruteforce import candidates, parse_target, search, search_space, unique_words
+from bruteforce import (
+    candidates,
+    parse_index,
+    parse_target,
+    search,
+    search_space,
+    unique_words,
+)
 
 
 def test_candidates_are_empty_then_ordered_selections_concatenated():
@@ -61,3 +68,14 @@ def test_parse_target_accepts_and_checksums(raw):
 def test_parse_target_rejects(raw):
     with pytest.raises(ValueError):
         parse_target(raw)
+
+
+@pytest.mark.parametrize(("raw", "expected"), [("0", 0), (7, 7), ("2147483647", 2**31 - 1)])
+def test_parse_index_accepts(raw, expected):
+    assert parse_index(raw) == expected
+
+
+@pytest.mark.parametrize("raw", ["-1", 2**31, "x"])
+def test_parse_index_rejects(raw):
+    with pytest.raises(ValueError):
+        parse_index(raw)

@@ -11,7 +11,7 @@ from pathlib import Path
 
 from dotenv import dotenv_values
 
-from bruteforce import parse_target, search, unique_words
+from bruteforce import parse_index, parse_target, search, unique_words
 from schemes import bip39, slip39
 
 SCHEMES = {
@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
             args.words or (env.get("WORDS") or input("Candidate words, space separated: ")).split()
         )
         target = parse_target(args.target or env.get("TARGET_ADDRESS") or input("Target address: "))
-        index = args.index if args.index is not None else int(env.get("ACCOUNT_INDEX") or 0)
+        index = parse_index(args.index if args.index is not None else env.get("ACCOUNT_INDEX") or 0)
         derive = scheme.load(env.get("MNEMONIC") or prompt_mnemonic(), index)
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)

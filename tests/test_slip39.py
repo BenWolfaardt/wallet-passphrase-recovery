@@ -69,15 +69,20 @@ def test_wrong_passphrase_still_decrypts_to_another_wallet():
     assert derive("wrong") != v.SLIP39_SINGLE_ADDRESS
 
 
-def test_rejects_below_threshold():
-    with pytest.raises(ValueError, match="invalid SLIP-39 shares"):
-        slip39.load(v.SLIP39_TWO_OF_THREE[0], index=0)
-
-
-def test_rejects_bad_checksum():
-    corrupted = v.SLIP39_SINGLE_SHARE[0].replace("keyboard", "academic")
-    with pytest.raises(ValueError, match="invalid SLIP-39 shares"):
-        slip39.load(corrupted, index=0)
+@pytest.mark.parametrize(
+    "mnemonic",
+    [
+        v.SLIP39_TWO_OF_THREE[0],  # one share of a 2-of-3
+        v.SLIP39_SINGLE_SHARE[0].replace("keyboard", "academic"),  # bad checksum
+        v.SLIP39_SINGLE_SHARE[0].replace("enlarge", "enlarg"),  # unknown word
+    ],
+    ids=["below-threshold", "bad-checksum", "unknown-word"],
+)
+def test_rejects_invalid_without_echoing_shares(mnemonic):
+    with pytest.raises(ValueError, match="invalid SLIP-39 shares") as error:
+        slip39.load(mnemonic, index=0)
+    assert not set(str(error.value).split()) & set(mnemonic.split())
+    assert "enlarg" not in str(error.value)
 
 
 def test_env_example_finds_passphrase(capsys):

@@ -16,8 +16,12 @@ def load(mnemonic: str, index: int) -> Derive:
     shares = [line.strip() for line in mnemonic.splitlines() if line.strip()]
     try:
         encrypted_secret = recover_ems(decode_mnemonics(shares))
-    except MnemonicError as e:
-        raise ValueError(f"invalid SLIP-39 shares: {e}") from e
+    except MnemonicError:
+        # The library's messages quote share words, so they must not reach the terminal.
+        raise ValueError(
+            "invalid SLIP-39 shares: unknown word, bad checksum, mismatched shares "
+            "or fewer shares than the threshold"
+        ) from None
 
     def derive(passphrase: str) -> str:
         return seed_to_address(encrypted_secret.decrypt(passphrase.encode()), index)
